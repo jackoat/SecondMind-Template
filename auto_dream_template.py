@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """
+
 Auto-Dream Template for SecondMind
 This template contains placeholder values for credentials and configurations.
 
@@ -8,7 +9,7 @@ IMPORTANT: Replace the placeholder values with your actual credentials before us
 MANDATE 10 COMPLIANCE:
 This template implements Mandate 10 requirements for BlueprintSyncManager, which includes:
 - Automatic synchronization between private and public repositories
-- PI I sanitation for public templates
+- PI I sanitization for public templates
 - Structural file identification (.py, .md, .json, .yaml, .yml)
 - Content verification and parity checks between private/public repo
 - Mandatory nightly sync execution as part of auto-dream cycles
@@ -21,7 +22,8 @@ from typing import Optional, List, Dict
 from pathlib import Path
 
 
-# ============NOTE CONFIGURATION#
+
+# ======NOTE CONFIGURATION#
 
 # Notion API Token (required)
 NOTION_API_TOKEN = "[API_TOKEN_PLACEHOLDER]"
@@ -36,7 +38,7 @@ NOTION_TAGS_DB_ID = "[NOTION_DATABASE_ID]"
 
 
 
-# ============SLM/API CONFIGURATION#
+# ======LLM/API CONFIGURATION#
 
 # API tokens for various services
 OPENAI_API_KEY = "[API_TOKEN_PLACEHOLDER]"
@@ -47,7 +49,7 @@ EMBEDDINGS_API_KEY = "[API_TOKEN_PLACEHOLDER]"
 
 
 
-# ============MODEL CONFIGURATION#
+# ======MODEL CONFIGURATION#
 
 # Default model settings
 LLM_MODEL = "gpt-4-turbo"
@@ -57,7 +59,8 @@ TEMPERATURE = 0.7
 
 
 
-# ============SECONDMIND TEMPLATE CONFIGURATION#
+
+# ======SECONDMIND TEMPLATE CONFIGURATION#
 
 # SecondMind instance settings
 INSTANCE_NAME = "secondmind-instance"
@@ -67,7 +70,8 @@ BATCH_SIZE = 10
 
 
 
-# ============NOTION CLIENT SETUP#
+
+# ======NOTION CLIENT SETUP#
 
 def get_notion_client():
     """Initialize and return a Notion client with the API token.
@@ -82,7 +86,7 @@ def get_notion_client():
 
 
 
-# ============BLUEPRINT SYNC MANAGER (MANDATE 10 COMPLIANT)#
+# ======BLUEPRINT SYNC MANAGER (MANDATE 10 COMPLIANT)#
 
 class BlueprintSyncManager:
     """
@@ -98,17 +102,17 @@ class BlueprintSyncManager:
         target_repo_path: Path or URL to the public/template repository
         private_branch: Branch name in the private repository (default: 'main')
         public_branch: Branch name in the public repository (default: 'main')
-    
+        
     MANDATE 10 REQUIREMENTS SATISFIED:
     - Structural file identification and cataloging
-    - PI I/content sanitation for public distribution
+    - PI I/content sanitization for public distribution
     - Automatic push to public template repositories
     - Parity verification between private and public mirroring
     - Integration with automated nightly sync cycles
     """
     
     # Skills excluded from public parity bridge (MANDATE 10)
-    SKILL_BLACKLIST = ["reddcap-sentinel", "temzocal-infraered", "companion-scout", "wiki-ingest-sub", "wiki-query-sub", "wiki-lint-sub"]
+    SKILL_BLACKLIST = ["reddcap-sentinel", "tezmocai-infraread", "companion-scout", "wiki-ingest-sub", "wiki-query-sub", "wiki-lint-sub", "neural-engine"]
     
     # File extensions considered as structural files
     STRUCTURAL_EXTENSIONS = {'.py', '.md', '.json', '.yaml', '.yml'}
@@ -116,19 +120,19 @@ class BlueprintSyncManager:
     # PI I patterns to sanitize
     PI_PATTERNS = [
         # API keys and tokens
-        (r'(i[._-]?key|apikey|secret[._-]?key)\s*[=:]\s*["\']?([A-Za-z0-9_\-]+)["\']?' , r'\1=API_KEY_REDACTED'),
+        (r'(i[._-]?key|apikey|secret[._-]?key)\s*[=:]\s*["\']?([A-Za-z0-9_\-]+)["\']?', r'\1=[API_KEY_REDACTED]'),
         # Email addresses
         (r'[\w\.\-]+@[\w\.\-]+\.\w+', '[EMAIL_REDACTED]'),
         # Personal names (common patterns - could be expanded)
         (r'\b[A-Z][a-z]+\s+[A-Z][a-z]+\b', '[NAME_REDACTED]'),
         # Phone numbers
-        (r'\(?(\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}', '[PHONE_REDACTED]'),
+        (r'\(?(\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}', '[PHONE_REDACTED]'),
         # Credit card-like patterns
-        (r'\b(?:(\d{4}[-\s]?){3}\d{4}\b', '[CC_REDACTED]'),
+        (r'\b(?:\d{4}[-\s]?){3}\d{4}\b', '[CC_REDACTED]'),
         # Password patterns
-        (r'password\s*[=:]\s*["\']?[^"\']+'"', 'password**********'),
+        (r'password\s*[=:]\s*["\']?[^"\']+["\']?', 'password**********'),
         # Token patterns
-        (r'token\s*[=:]\s*["\']?([A-Za-z0-9_\-]{20,})["\']?' , r'token=TOKEN_REDACTED'),
+        (r'token\s*[=:]\s*["\']?([A-Za-z0-9_\-]{20,})["\']?', r'token=TOKEN_REDACTED'),
     ]
     
     def __init__(self, source_dir: str, target_repo_path: str):
@@ -162,11 +166,12 @@ class BlueprintSyncManager:
         """
         Identify and return a list of all structural files in the source directory.
         
-        Structural files are defined as those with extensions: .py, .md, .json, .yaml, .yml - which represent code, documentation, and configuration files.
+        Structural files are defined as those with extensions: .py, .md, .json, .yaml, .yml - which
+        represent code, documentation, and configuration files.
         
         Returns:
             List[str]: List of file paths (relative to source_dir) for all
-                      structural files found
+                       structural files found
         
         MANDATE 10 REQUIREMENT:
         Structural file identification is the first phase of blueprint sync,
@@ -218,7 +223,7 @@ class BlueprintSyncManager:
     
     def sanitize_content(self, content: str) -> str:
         """
-        Replace PII (Personally Identifiable Information) and sensitive data
+        Replace PI I (Personally Identifiable Information) and sensitive data
         with redaction placeholders.
         
         Args:
@@ -226,10 +231,10 @@ class BlueprintSyncManager:
         
         Returns:
             str: Sanitized content with all PI I replaced by placeholders
-                including [API_KEY_REDACTED], [EMAIL_REDACTED], etc.
+                    including [API_KEY_REDACTED], [EMAIL_REDACTED], etc.
         
         MANDATE 10 REQUIREMENT:
-        Content sanitation is the critical privacy protection phase that
+        Content sanitization is the critical privacy protection phase that
         ensures no sensitive information is exposed in public repositories.
         """
         sanitized = content
@@ -238,28 +243,28 @@ class BlueprintSyncManager:
         for pattern, replacement in self.PI_PATTERNS:
             sanitized = re.sub(pattern, replacement, sanitized)
         
-        # Additional custom sanitation rules
+        # Additional custom sanitization rules
         # Remove common credential patterns that may not match above patterns
         credential_patterns = [
             # GitHub tokens
-            r'ghp_[A-Za-z0-9_]{36}', 'GITHUB_TOKEN_REDACTED'),
+            (r'gh_[A-Za-z0-9_]{36}', 'GITHUB_TOKEN_REDACTED'),
             # Generic secrets
-            r'(?i)"?secret"?\s*:\s*("[^"]+")', r'"secret": "SECRET_REDACTED"'),
+            r'(?i)"?secret"?\s*:\s*("[^"]+")', r'"secret": "SECRET_REDACTED"',
             # AWS credentials
             r'(AKIA[0-9A-Z]{16})', 'AWS_KEY_REDACTED'),
             # Private key markers
-            (r'-----BEGIN\s*(RSA\s*)?PRIVATE\s*KEY-----.*?-----END\s*(RSA\s*)?PRIVATE\s*KEY-----',
-            '[PRIVATE_KEY_REDACTED]'),
+            (r'----BEGIN\s*(RSA\s*)?PRIVATE\s*KEY----.*?----END\s*(RSA\s*)?PRIVATE\s*KEY----',
+             '[PRIVATE_KEY_REDACTED]'),
         ]
         
         for pattern, replacement in credential_patterns:
             sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
         
         # Remove any remaining placeholder-like patterns that might leak info
-        sanitized = re.sub(r'\[.*_ID\.\*\]', '[REDACTED]', sanitized)
-        sanitized = re.sub(r'\[.*_PATH\.\*\]', '[REDACTED]', sanitized)
+        sanitized = re.sub(r'\[.*_ID\.\*\]$', '[REDACTED]', sanitized)
+        sanitized = re.sub(r'\[.*_PATH\.\*\]$', '[REDACTED]', sanitized)
         
-        # Track sanitation
+        # Track sanitization
         if sanitized != content:
             self.sync_log.append({
                 "action": "sanitized",
@@ -282,7 +287,7 @@ class BlueprintSyncManager:
         
         Args:
             branch: Branch name to commit to in the public repository
-                   (default: "main")
+                   (default: 'main')
         
         Returns:
             bool: True if sync was successful, False otherwise
@@ -401,11 +406,11 @@ class BlueprintSyncManager:
         Verify parity between the private source and public template repositories.
         
         This method ensures that all structural files from the source have been
-        properly mirrored to the public repository with correct sanitation.
+        properly mirrored to the public repository with correct sanitization.
         
         Returns:
             bool: True if parity is verified (all files present and sanitized),
-                False otherwise
+                       False otherwise
         
         MANDATE 10 REQUIREMENT:
         Parity verification is the quality assurance phase that confirms
@@ -507,19 +512,20 @@ class BlueprintSyncManager:
             "total_structural_files": len(self.structural_files),
             "files_sanitized": len(self.sanitized_files),
             "files_pushed": sum(1 for log in self.sync_log
-                                if log.get("action") == "push_success"),
+                    if log.get("action") == "push_success"),
             "parity_verified": self.verified_parity,
             "sync_log": self.sync_log
 
 
-# ============BLUEPRINT SYNC ORCHESTRATION#
+
+# ======BLUEPRINT SYNC ORCHESTRATION#
 
 def run_blueprint_sync() -> Dict:
     """
     Execute the complete BlueprintSync workflow as mandated by Mandate 10.
     
     This function orchestrates the full synchronization process:
-    1. Initializes BlueprintSyncManager with source and target paths
+    1. Initialize BlueprintSyncManager with source and target paths
     2. Identifies new/modified structural files
     3. Sanitizes all content to remove PI I
     4. Pushes sanitized files to public repository
@@ -527,8 +533,8 @@ def run_blueprint_sync() -> Dict:
     
     Returns:
         Dict containing the sync report with all operation results
-        including files processed, sanitation status, and parity
-        verification results.
+           including files processed, sanitization status, and parity
+           verification results.
     
     MANDATE 10 REQUIREMENTS SATISFIED:
     This function implements the complete Mandate 10 blueprint sync
@@ -543,7 +549,7 @@ def run_blueprint_sync() -> Dict:
     
     # Try to use existing directories, create defaults if needed
     if not source_dir.exists():
-        # Fallback to current directory for template demonstration
+        # Fall back to current directory for template demonstration
         source_dir = current_dir
     
     print("=" * 70)
@@ -563,7 +569,7 @@ def run_blueprint_sync() -> Dict:
     print(f"\n[2/5] Identifying structural files (.py, .md, .json, .yaml, .yml)...")
     structural_files = manager.identify_structural_files()
     print(f"    Found {len(structural_files)} structural files:")
-    for f in structural_files[:10]:   # Show first 10
+    for f in structural_files[:10]:    # Show first 10
         print(f"    - {f}")
     if len(structural_files) > 10:
         print(f"    ... and {len(structural_files) - 10} more files")
@@ -577,8 +583,8 @@ def run_blueprint_sync() -> Dict:
                 content = f.read()
             manager.sanitize_content(content)
     
-    sanitation_count = len(manager.sanitized_files)
-    print(f"    Processed and sanitized {sanitation_count} files")
+    sanitization_count = len(manager.sanitized_files)
+    print(f"    Processed and sanitized {sanitization_count} files")
     
     # Step 4: Push to public repository
     print(f"\n[4/5] Pushing to public template repository...")
@@ -606,11 +612,11 @@ def run_blueprint_sync() -> Dict:
     
     # Print warning if any issues
     if not parity_status:
-        print(f"\n⚠ MANDATE 10 COMPLIANCE: Blueprint sync completed with warnings")
+        print(f"\n\u26a0\ufe0f MANDATE 10 COMPLIANCE: Blueprint sync completed with warnings")
         print("  Please review the sync log for details.")
     
     if not push_success:
-        print(f"\n⚠ WARNING: Some files failed to push!")
+        print(f"\n\u26a0\ufe0f WARNING: Some files failed to push!")
         print("  Check the sync log for error details.")
     
     print("\n" + "=" * 70)
@@ -618,7 +624,8 @@ def run_blueprint_sync() -> Dict:
     return report
 
 
-# ============AUTO-DREAM MANAGER#
+
+# ======AUTO-DREAM MANAGER#
 
 class AutoDreamManager:
     """Main class for managing auto-dream operations.
@@ -677,8 +684,8 @@ class AutoDreamManager:
         cycle as a mandatory nightly operation for template management.
         
         MANDATE 10 REQUIREMENT:
-        Blueprint sync is a mandatory phase of the nightly auto-dream cycle,
-        ensuring that template repositories are kept synchronized with
+        Blueprint sync is a MANDATORY phase of every auto-dream
+        cycle. It ensures that template repositories are kept synchronized with
         sanitized, public-ready content.
         """
         print("\n" + "=" * 70)
@@ -691,10 +698,10 @@ class AutoDreamManager:
             
             # Log sync completion
             if sync_report['parity_verified']:
-                print(f"\n✓ MANDATE 10 COMPLIANCE: Blueprint sync completed successfully")
+                print(f"\n\u2705 MANDATE 10 COMPLIANCE: Blueprint sync completed successfully")
                 print("  All structural files synchronized and verified")
             else:
-                print(f"\n⚠ MANDATE 10 COMPLIANCE: Blueprint sync completed with warnings")
+                print(f"\n\u26a0\ufe0f MANDATE 10 COMPLIANCE: Blueprint sync completed with warnings")
                 print("  Please review the sync log for details.")
             
             return {
@@ -703,14 +710,15 @@ class AutoDreamManager:
                 "report": sync_report
             }
         except Exception as e:
-            print(f"\n✗ MANDATE 10 ERROR: Blueprint sync failed: {e}")
+            print(f"\n\u274c MANDATE 10 ERROR: Blueprint sync failed: {e}")
             return {
                 "status": "failed",
                 "error": str(e),
                 "report": None
 
 
-# ============AUTO-DREAM FUNCTIONS#
+
+# ======AUTO-DREAM FUNCTIONS#
 
 def generate_dream(context_file: str = None):
     """Generate a single dream entry.
@@ -731,7 +739,7 @@ def generate_dream(context_file: str = None):
         context = {}
         
     # Generate dream using configured model
-    # This would interface with the LLM API
+    # This would interact with the LLM API
     dream = {
         "timestamp": "2026-04-19T00:00:00Z",
         "context": context,
@@ -753,6 +761,7 @@ def save_dream_to_storage(dream: Dict, storage_path: str = None):
         json.dump(dream, f, indent=2)
         
     return file_path
+
 
 
 def run_auto_dream_cycle():
@@ -818,7 +827,8 @@ def run_auto_dream_cycle():
         "blueprint_sync": blueprint_result
 
 
-# ============MAIN EXECUTION#
+
+# ======MAIN EXECUTION#
 
 if __name__ == "__main__":
     # Example usage
@@ -834,7 +844,7 @@ if __name__ == "__main__":
     print("=" * 70)
     print("This template now includes Mandate 10 BlueprintSyncManager:")
     print("  - Automatic structural file identification")
-    print("  - PI I sanitation for public templates")
+    print("  - PI I sanitization for public templates")
     print("  - GitHub repository synchronization")
     print("  - Parity verification between private/public repos")
     print("  - Mandatory nightly blueprint sync execution")
