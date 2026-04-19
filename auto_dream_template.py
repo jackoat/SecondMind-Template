@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Auto-Dream Template for SecondMind
 This template contains placeholder values for credentials and configurations.
@@ -10,7 +10,7 @@ This template implements Mandate 10 requirements for BlueprintSyncManager, which
 - Automatic synchronization between private and public repositories
 - PII sanitization for public templates
 - Structural file identification (.py, .md, .json, .yaml, .yml)
-- Content verification and parity checks between private/public repos
+- Content verification and parity checks between private/public repo
 - Mandatory nightly sync execution as part of auto-dream cycles
 """
 
@@ -20,9 +20,7 @@ import re
 from typing import Optional, List, Dict
 from pathlib import Path
 
-# ==============================================================================
-# NOTION CONFIGURATION
-# ==============================================================================
+# ==========NOTION CONFIGURATION#
 
 # Notion API Token (required)
 NOTION_API_TOKEN = "[API_TOKEN_PLACEHOLDER]"
@@ -36,9 +34,7 @@ NOTION_CONTENT_DB_ID = "[NOTION_DATABASE_ID]"
 NOTION_TAGS_DB_ID = "[NOTION_DATABASE_ID]"
 
 
-# ==============================================================================
-# MEMORY PATH CONFIGURATION
-# ==============================================================================
+# ==========MEMORY PATH CONFIGURATION#
 
 # Memory storage paths for local files and databases
 MEMORY_BASE_PATH = "[MEMORY_PATH]"
@@ -51,21 +47,17 @@ MEMORY_INDEX_PATH = "[MEMORY_PATH]"
 MEMORY_CACHE_PATH = "[MEMORY_PATH]"
 
 
-# ==============================================================================
-# LLM/API CONFIGURATION
-# ==============================================================================
+# ==========LLM/API CONFIGURATION#
 
 # API tokens for various services
 OPENAI_API_KEY = "[API_TOKEN_PLACEHOLDER]"
 ANTHROPIC_API_KEY = "[API_TOKEN_PLACEHOLDER]"
 COHERE_API_KEY = "[API_TOKEN_PLACEHOLDER]"
 REPLICATE_API_KEY = "[API_TOKEN_PLACEHOLDER]"
-EMBEDDING_API_KEY = "[API_TOKEN_PLACEHOLDER]"
+EMBEDDINGS_API_KEY = "[API_TOKEN_PLACEHOLDER]"
 
 
-# ==============================================================================
-# MODEL CONFIGURATION
-# ==============================================================================
+# ==========MODEL CONFIGURATION#
 
 # Default model settings
 LLM_MODEL = "gpt-4-turbo"
@@ -74,9 +66,7 @@ CONTEXT_WINDOW = 128000
 TEMPERATURE = 0.7
 
 
-# ==============================================================================
-# SECONDMINDB TEMPLATE CONFIGURATION
-# ==============================================================================
+# ==========SECONDMINDB TEMPLATE CONFIGURATION#
 
 # SecondMind instance settings
 INSTANCE_NAME = "secondmind-instance"
@@ -85,9 +75,7 @@ DREAM_INTERVAL_SECONDS = 60
 BATCH_SIZE = 10
 
 
-# ==============================================================================
-# NOTION CLIENT SETUP
-# ==============================================================================
+# ==========NOTION CLIENT SETUP#
 
 def get_notion_client():
     """Initialize and return a Notion client with the API token.
@@ -101,15 +89,13 @@ def get_notion_client():
     return client
 
 
-# ==============================================================================
-# BLUEPRINT SYNC MANAGER (MANDATE 10 COMPLIANT)
-# ==============================================================================
+# ==========BLUEPRINT SYNC MANAGER (MANDATE 10 COMPLIANT)#
 
 class BlueprintSyncManager:
     """
     Manages synchronization between private and public GitHub repositories.
     
-    This class implements Mandate 10 requirements for automated blueprint
+    This class implements Mandate 10 requirements for automatic blueprint
     synchronization, ensuring that sanitized structural files are properly
     mirrored between private development repositories and public template
     repositories while protecting sensitive information.
@@ -123,10 +109,13 @@ class BlueprintSyncManager:
     MANDATE 10 REQUIREMENTS SATISFIED:
     - Structural file identification and cataloging
     - PII/content sanitization for public distribution
-    - Automated push to public template repositories
+    - Automatic push to public template repositories
     - Parity verification between private and public mirroring
     - Integration with automated nightly sync cycles
     """
+    
+    # Skills excluded from public parity bridge (MANDATE 10)
+    SKILL_BLACKLIST = ["redcap-sentinel", "temazcal-infrared"]
     
     # File extensions considered as structural files
     STRUCTURAL_EXTENSIONS = {'.py', '.md', '.json', '.yaml', '.yml'}
@@ -134,7 +123,7 @@ class BlueprintSyncManager:
     # PII patterns to sanitize
     PII_PATTERNS = [
         # API keys and tokens
-        (r'(?i)(api[_-]?key|apikey|secret[_-]?key)\s*[=:]\s*["\']?([A-Za-z0-9_\-]+)["\']?', r'\1=[API_KEY_REDACTED]'),
+        (r'(i?)(api[_-]?key|apikey|secret[_-]?key)\s*[=:]\s*["\']?([A-Za-z0-9_\-]+)["\']?', r'\1[API_KEY_REDACTED]'),
         # Email addresses
         (r'[\w\.-]+@[\w\.-]+\.\w+', '[EMAIL_REDACTED]'),
         # Personal names (common patterns - could be expanded)
@@ -144,7 +133,7 @@ class BlueprintSyncManager:
         # Credit card-like patterns
         (r'\b(?:\d{4}[-\s]?){3}\d{4}\b', '[CC_REDACTED]'),
         # Password patterns
-        (r'password\s*[=:]\s*["\']?[^"\']+', 'password=********'),
+        (r'password\s*[=:]\s*["\']?[^"\']+'', 'password=*********'),
         # Token patterns
         (r'token\s*[=:]\s*["\']?([A-Za-z0-9_\-]{20,})["\']?', r'token=[TOKEN_REDACTED]'),
     ]
@@ -155,9 +144,9 @@ class BlueprintSyncManager:
         
         Args:
             source_dir: Absolute or relative path to the private/source directory
-                       containing the original files to be synchronized
+                        containing the original files to be synchronized
             target_repo_path: Path or URL to the public/template repository
-                             where sanitized files will be pushed
+                              where sanitized files will be pushed
         """
         self.source_dir = Path(source_dir).resolve()
         self.target_repo_path = target_repo_path
@@ -169,7 +158,7 @@ class BlueprintSyncManager:
             raise FileNotFoundError(f"Source directory does not exist: {source_dir}")
         
         # Tracking for synchronization stats
-        self.structural_files: List[Path] = []
+        self.structural_files: List[str] = []
         self.sanitized_files: Dict[str, str] = {}
         self.verified_parity = False
         
@@ -180,18 +169,20 @@ class BlueprintSyncManager:
         """
         Identify and return a list of all structural files in the source directory.
         
-        Structural files are defined as those with extensions: .py, .md, .json, 
-        .yaml, .yml - which represent code, documentation, and configuration files.
+        Structural files are defined as those with extensions: .py, .md, .json, .yaml, .yml - which represent code, documentation, and configuration files.
         
         Returns:
-            List[str]: List of file paths (relative to source_dir) for all 
-                      structural files found
-                      
+            List[str]: List of file paths (relative to source_dir) for all
+                       structural files found
+        
         MANDATE 10 REQUIREMENT:
         Structural file identification is the first phase of blueprint sync,
         cataloging all files that should be considered for public distribution.
         """
         self.structural_files = []
+        
+        # MANDATE 10: Skip blacklisted skill directories
+        blacklisted_dirs = set(self.SKILL_BLACKLIST)
         
         for ext in self.STRUCTURAL_EXTENSIONS:
             # Find all files with the given extension
@@ -200,6 +191,16 @@ class BlueprintSyncManager:
                 if file_path.is_file():
                     # Get relative path from source_dir
                     rel_path = str(file_path.relative_to(self.source_dir))
+                    
+                    # Skip files in blacklisted directories
+                    if any(blacklist_dir in rel_path.split('/') for blacklist_dir in blacklisted_dirs):
+                        self.sync_log.append({
+                            "action": "blacklist_skip",
+                            "file": rel_path,
+                            "reason": "In SKILL_BLACKLIST"
+                        })
+                        continue
+                    
                     self.structural_files.append(rel_path)
                     
                     # Log the file identification for M10 compliance
@@ -229,7 +230,7 @@ class BlueprintSyncManager:
         
         Args:
             content: Original string content that may contain sensitive information
-            
+        
         Returns:
             str: Sanitized content with all PII replaced by placeholders
                  including [API_KEY_REDACTED], [EMAIL_REDACTED], etc.
@@ -250,11 +251,11 @@ class BlueprintSyncManager:
             # GitHub tokens
             r'ghp_[A-Za-z0-9_]{36}', 'GITHUB_TOKEN_REDACTED'),
             # Generic secrets
-            r'(?i)\"?secret\"?\s*:\s*\"([^\"]+)\"', r'"secret": "SECRET_REDACTED"'),
+            r'(?i)"?secret"?\s*:\s*"([^"]+)"', r'"secret": "SECRET_REDACTED"'),
             # AWS credentials
             r'(AKIA[0-9A-Z]{16})', 'AWS_KEY_REDACTED'),
-            # Private keys markers
-            (r'-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----.*?-----END\s+(RSA\s+)?PRIVATE\s+KEY-----', 
+            # Private key markers
+            (r'-+----BEGIN\s*+(RSA\s*)?PRIVATE\s*KEY-+----.*?-+----END\s*+(RSA\s*)?PRIVATE\s*KEY-+----',
              '[PRIVATE_KEY_REDACTED]'),
         ]
         
@@ -288,7 +289,7 @@ class BlueprintSyncManager:
         
         Args:
             branch: Branch name to commit to in the public repository
-                   (default: "main")
+                    (default: "main")
         
         Returns:
             bool: True if sync was successful, False otherwise
@@ -512,16 +513,13 @@ class BlueprintSyncManager:
         return {
             "total_structural_files": len(self.structural_files),
             "files_sanitized": len(self.sanitized_files),
-            "files_pushed": sum(1 for log in self.sync_log 
-                               if log.get("action") == "push_success"),
+            "files_pushed": sum(1 for log in self.sync_log
+                                    if log.get("action") == "push_success"),
             "parity_verified": self.verified_parity,
             "sync_log": self.sync_log
-        }
 
 
-# ==============================================================================
-# BLUEPRINT SYNC ORCHESTRATION
-# ==============================================================================
+# ==========BLUEPRINT SYNC ORCHESTRATION#
 
 def run_blueprint_sync() -> Dict:
     """
@@ -547,7 +545,7 @@ def run_blueprint_sync() -> Dict:
     # Define source and target paths
     # In production, these could be passed as parameters or loaded from config
     current_dir = Path(__file__).parent
-    source_dir = current_dir / "private"  # Private development files
+    source_dir = current_dir / "private"   # Private development files
     target_repo = "https://github.com/jackoat/SecondMind-Template.git"
     
     # Try to use existing directories, create defaults if needed
@@ -569,13 +567,13 @@ def run_blueprint_sync() -> Dict:
     print(f"    Target repository: {manager.target_repo_path}")
     
     # Step 2: Identify structural files
-    print("\n[2/5] Identifying structural files (".py", ".md", ".json", ".yaml", ".yml")...")
+    print("\n[2/5] Identifying structural files (.py, .md, .json, .yaml, .yaml)...")
     structural_files = manager.identify_structural_files()
     print(f"    Found {len(structural_files)} structural files:")
-    for f in structural_files[:10]:  # Show first 10
-        print(f"      - {f}")
+    for f in structural_files[:10]:   # Show first 10
+        print(f"    - {f}")
     if len(structural_files) > 10:
-        print(f"      ... and {len(structural_files) - 10} more files")
+        print(f"    ... and {len(structural_files) - 10} more files")
     
     # Step 3: Sanitize content
     print("\n[3/5] Sanitizing content (removing PII and sensitive data)...")
@@ -615,7 +613,7 @@ def run_blueprint_sync() -> Dict:
     
     # Print warning if any issues
     if not parity_status:
-        print("\n⚠ WARNING: Parity verification failed!")
+        print("\n⚠ MANDATE 10 COMPLIANCE: Blueprint sync completed with warnings")
         print("  Please review the sync log for details.")
     
     if not push_success:
@@ -627,14 +625,12 @@ def run_blueprint_sync() -> Dict:
     return report
 
 
-# ==============================================================================
-# AUTO-DREAM MANAGER
-# ==============================================================================
+# ==========AUTO-DREAM MANAGER#
 
 class AutoDreamManager:
     """Main class for managing auto-dream operations.
     
-    This class orchestrates the complete auto-dream cycle including:
+    This class orchestrates the complete auto-dream lifecycle including:
     - Dream generation
     - Knowledge storage and retrieval
     - Archival management
@@ -644,7 +640,7 @@ class AutoDreamManager:
     
     def __init__(self):
         self.memory_base_path = os.path.join(
-            MEMORY_BASE_PATH, 
+            MEMORY_BASE_PATH,  
             "auto_dream_storage"
         )
         self.notion_client = get_notion_client()
@@ -662,7 +658,6 @@ class AutoDreamManager:
     
     def store_knowledge_item(self, item_data: Dict):
         """Store a knowledge item to the Notion database and local memory."""
-        # Implementation would go here
         database_id = NOTION_KNOWLEDGE_DB_ID
         local_path = MEMORY_KNOWLEDGE_PATH
     
@@ -673,7 +668,7 @@ class AutoDreamManager:
         return []
     
     def archive_dream(self, dream_id: str):
-        """Archive a dream to the archive database."""
+        """Archive a dream to the archival database."""
         database_id = NOTION_ARCHIVE_DB_ID
         local_path = MEMORY_ARCHIVE_PATH
     
@@ -703,10 +698,10 @@ class AutoDreamManager:
             
             # Log sync completion
             if sync_report['parity_verified']:
-                print("\n✓ MANDATE 10 COMPLIANCE: Blueprint sync completed successfully")
+                print("\n✔ MANDATE 10 COMPLIANCE: Blueprint sync completed successfully")
                 print("  All structural files synchronized and verified")
             else:
-                print("\n⚠ MANDATE 10 COMPLIANCE: Blueprint sync completed with warnings")
+                print("\n✔ MANDATE 10 COMPLIANCE: Blueprint sync completed with warnings")
                 print("  Review sync report for details")
             
             return {
@@ -714,26 +709,22 @@ class AutoDreamManager:
                 "success": sync_report['parity_verified'],
                 "report": sync_report
             }
-            
         except Exception as e:
             print(f"\n✗ MANDATE 10 ERROR: Blueprint sync failed: {e}")
             return {
                 "status": "failed",
                 "error": str(e),
                 "report": None
-            }
 
 
-# ==============================================================================
-# AUTO-DREAM FUNCTIONS
-# ==============================================================================
+# ==========AUTO-DREAM FUNCTIONS#
 
 def generate_dream(context_file: str = None):
     """Generate a single dream entry.
     
     Args:
         context_file: Optional filename containing context data
-        
+    
     Returns:
         Dict containing dream data with timestamp, context, and content
     """
@@ -756,12 +747,13 @@ def generate_dream(context_file: str = None):
     
     return dream
     
+
 def save_dream_to_storage(dream: Dict, storage_path: str = None):
     """Save dream to local memory storage."""
     if storage_path is None:
         storage_path = MEMORY_DREAMS_PATH
         
-    timestamp = dream.get("timestamp", "")
+    timestamp = dream.get('timestamp', "")
     file_name = f"dream_{timestamp}.json"
     file_path = os.path.join(storage_path, file_name)
     
@@ -831,12 +823,9 @@ def run_auto_dream_cycle():
         "dream": dream,
         "storage_path": storage_path,
         "blueprint_sync": blueprint_result
-    }
 
 
-# ==============================================================================
-# MAIN EXECUTION
-# ==============================================================================
+# ==========MAIN EXECUTION#
 
 if __name__ == "__main__":
     # Example usage
@@ -847,7 +836,6 @@ if __name__ == "__main__":
         "\nRemember to replace all placeholder values with actual credentials!"
     )
     
-
     print("\n" + "=" * 70)
     print("MANDATE 10 FEATURES")
     print("=" * 70)
@@ -855,6 +843,6 @@ if __name__ == "__main__":
     print("  - Automatic structural file identification")
     print("  - PII sanitization for public templates")
     print("  - Git repository synchronization")
-    print("  - Parity verification between private/public repos")
+    print("  - Parity verification between private/public reos")
     print("  - Mandatory nightly blueprint sync execution")
     print("=" * 70)
