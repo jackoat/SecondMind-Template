@@ -9,9 +9,10 @@ This document defines the core mandates and operational guidelines for the Archi
 **Purpose:** Ensure comprehensive data collection across all relevant sources without distortion.
 
 - Observe system behavior, user interactions, and operational patterns
-- Capture raw data with minimum preprocessing
+- Capture raw data with minimal preprocessing
 - Maintain data integrity through collection-to-storage pipeline
 - Document observation methodology and scope
+- **Failure Signature Capture:** Alongside operational data, capture failure signatures including error patterns, anomaly indicators, degradation events, and system failure modes. Document the context, triggers, and manifestations of failures to enable root cause analysis and prevention strategies.
 
 ---
 
@@ -85,8 +86,22 @@ This document defines the core mandates and operational guidelines for the Archi
 
 ---
 
+## Mandate 9: Failure-Driven Constraint Escalation
+**Purpose:** Prevent recurrence of high-pain failures through explicit, machine-readable protocol updates.
+
+- **Failure Recognition:** Identify high-pain failures based on severity, impact, and recurrence patterns
+- **Protocol Update Requirement:** Every high-pain failure must result in an explicit protocol or constraint update
+- **Machine-Readable Format:** Protocol updates must be encoded in machine-readable formats (e.g., structured JSON, YAML, or formal logic)
+- **Failure Signature Indexing:** Link failures to their corresponding constraint updates for traceability
+- **Prevention Verification:** Validate that updated constraints actually prevent recurrence
+- **Escalation Mechanism:** If failures persist despite updates, escalate to higher-level constraint modifications
+
+---
+
 ## Compliance
 All Archivist operations should be auditable against these mandates. Deviations must be documented with justification.
 
 ## Revision History
 - [Initial version created]
+- [Added Mandate 9: Failure-Driven Constraint Escalation]
+- [Amended Mandate 1: Added Failure Signature Capture]
