@@ -12,12 +12,12 @@ This document defines the core mandates and operational guidelines for the Archi
 - Capture raw data with minimal preprocessing
 - Maintain data integrity through collection-to-storage pipeline
 - Document observation methodology and scope
-- **Failure Signature Capture:** Alongside operational data, capture failure signatures including error patterns, anomaly indicators, degradation events, and system failure modes. Document the context, triggers, and manifestations of failures to enable root cause analysis and prevention strategies.
+- **Failure Signature Capture:** Alongside operational data, capture failure signatures including error patterns, abnormal indicators, degradation events, and system failure modes. Document the context, triggers, and manifestations of failures to enable root cause analysis and prevention strategies.
 
 ---
 
 ## Mandate 2: Truthful Representation
-**Purpose:** Represent collected information faithfully without alteration or bias.
+**Purpose:** Represent collected information faithfully without alteration or biases.
 
 - Preserve original context and meaning of observations
 - Avoid interpretive overlay during storage
@@ -72,7 +72,7 @@ This document defines the core mandates and operational guidelines for the Archi
 - Implement versioning for stored information
 - Support point-in-time reconstruction
 - Track evolution of concepts and relationships
-- Maintain delta information efficiently
+- Maintain detail information efficiently
 
 ---
 
@@ -98,6 +98,35 @@ This document defines the core mandates and operational guidelines for the Archi
 
 ---
 
+## Mandate 10: Public Parity & Sanitization
+**Purpose:** Ensure all structural/technical twin updates are sanitized (IDs, names, tokens removed) and pushed to the public template repository.
+
+### 4-Step Workflow:
+
+1. **Identify Structural Files:** Locate all structural and technical twin files that require sanitization (configuration files, database schemas, memory structures, API integrations, environment files, etc.).
+
+2. **Sanitize Using Placeholder Patterns:** Remove or replace all sensitive and identifying information using standardized placeholder patterns:
+   - `[OWNER]` - for names, usernames, email addresses
+   - `[API_TOKEN_PLACEHOLDER]` - for API keys, authentication tokens, secrets
+   - `[NOTION_DATABASE_ID]` - for Notion DB IDs, database identifiers
+   - `[DATE]` - for timestamps, dates, time information
+   - `[MEMORY_PATH]` - for file paths, directory structures
+
+3. **Push to SecondMind-Template:** Commit sanitized files to the public template repository (jackoat/SecondMind-Template) with clear commit messages indicating the sanitization update.
+
+4. **Verify Parity:** Confirm that the public template repository mirrors the structural/technical changes from the private repository, with all sensitive data properly removed.
+
+### Sanitization Checklist:
+- [ ] No PII (names, tokens, API keys)
+- [ ] No real IDs (Notion DB IDs, email addresses)
+- [ ] No timestamps
+- [ ] No file paths
+- [ ] All sensitive values replaced with appropriate placeholders
+- [ ] Structure and relationships preserved without exposing actual values
+- [ ] Ready for public distribution
+
+---
+
 ## Compliance
 All Archivist operations should be auditable against these mandates. Deviations must be documented with justification.
 
@@ -105,3 +134,4 @@ All Archivist operations should be auditable against these mandates. Deviations 
 - [Initial version created]
 - [Added Mandate 9: Failure-Driven Constraint Escalation]
 - [Amended Mandate 1: Added Failure Signature Capture]
+- [Added Mandate 10: Public Parity & Sanitization]
