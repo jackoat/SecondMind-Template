@@ -5,9 +5,8 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-# ---------------------------------------------------------------------------
-# Neo4j schema constants
-# ---------------------------------------------------------------------------
+
+# ── Neo4j schema constants ───────────────────────────────────────────────────
 
 NODE_LABELS = {
     "NOTE": "Note",
@@ -29,10 +28,39 @@ REL_TYPES = {
     "CREATED_ON": "CREATED_ON",
 }
 
+# ── Sovereign SecondMind Schema Extensions ───────────────────────────────────
 
-# ---------------------------------------------------------------------------
-# NotePack – structured container for note data going in/out of Neo4j
-# ---------------------------------------------------------------------------
+NOTE_PACK_LABELS = {
+    "note_pack": "NotePack",
+    "entity": "Entity",
+    "concept": "Concept",
+}
+
+NOTE_PACK_REL_TYPES = {
+    "relates_to": "RELATES_TO",
+    "semantically_similar": "SEMANTICALLYSIMILAR",
+    "contains": "CONTAINS",
+    "references": "REFERENCES",
+}
+
+NOTE_PACK_FILES = {"original": "Original.md", "analysis": "Analysis.md"}
+
+
+
+def get_note_pack_path(pack_name: str, base_dir: str = ".raw") -> str:
+    """Return expected path for a note pack given its name."""
+    return os.path.join(base_dir, pack_name)
+
+
+def get_note_pack_file_path(pack_name: str, file_key: str, base_dir: str = ".raw") -> str:
+    """Return path to a specific file within a note pack."""
+    filename = NOTE_PACK_FILES.get(file_key)
+    if not filename:
+        raise ValueError(f"Unknown file key: {file_key}. Choose from: {list(NOTE_PACK_FILES.keys())}")
+    return os.path.join(base_dir, pack_name, filename)
+
+
+# ── NotePack — structured container for note data going in/out of Neo4j ──────
 
 class NotePack:
     """A lightweight container holding all fields of a note to be persisted."""
@@ -79,9 +107,7 @@ class NotePack:
         return cls(**{k: v for k, v in data.items() if k in cls.__slots__})
 
 
-# ---------------------------------------------------------------------------
-# Neo4j bridge
-# ---------------------------------------------------------------------------
+# ── Neo4j bridge ──────────────────────────────────────────────
 
 class Neo4jBridge:
     """Thin wrapper around a Neo4j driver that reads credentials from
@@ -110,9 +136,9 @@ class Neo4jBridge:
             self._driver.close()
             self._driver = None
 
-    # ------------------------------------------------------------------
+    # ───────────────────────────────────────────────────────
     # Public helpers
-    # ------------------------------------------------------------------
+    # ───────────────────────────────────────────────────────
 
     def merge_node(
         self,
@@ -144,14 +170,35 @@ class Neo4jBridge:
         node = record["n"]
         return dict(node)
 
+    def merge_pack_node(
+        self,
+        label: str,
+        name: str,
+        type_: str = "note_pack",
+        source: str = "unknown",
+        count: int = 0,
+    ) -> Any:
+        """Merge a node using the standard pack schema (name, type, source, count, updated_at)."""
+        return self.merge_node(
+            label=label,
+            key_property="name",
+            key_value=name,
+            properties={
+                "type": type_,
+                "source": source,
+                "count": count,
+                "updated_at": now_iso(),
+            },
+        )
+
     def run(self, query: str, **parameters: Any) -> Any:
         """Execute a Cypher query and return the result."""
         with self.driver.session() as session:
             return session.run(query, **parameters)
 
-    # ------------------------------------------------------------------
+    # ───────────────────────────────────────────────────────
     # Context-manager support
-    # ------------------------------------------------------------------
+    # ───────────────────────────────────────────────────────
 
     def __enter__(self) -> "Neo4jBridge":
         return self
@@ -160,9 +207,7 @@ class Neo4jBridge:
         self.close()
 
 
-# ---------------------------------------------------------------------------
-# Utility functions
-# ---------------------------------------------------------------------------
+# ── Utility functions ──────────────────────────────────────────────────
 
 def now_iso() -> str:
     """Return the current UTC timestamp as an ISO-8601 string."""
